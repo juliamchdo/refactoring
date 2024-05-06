@@ -3,8 +3,16 @@ import Segment from "./Segment";
 
 export default class OvernightFareCalculator implements FareCalculator{
     FARE = 3.9;
-    calculate(segment: Segment): number {
-     return segment.distance * this.FARE;
+    next?: FareCalculator;
+
+    constructor(next?: FareCalculator) {
+        this.next = next;
     }
-    
+    calculate(segment: Segment): number {
+        if (segment.isOvernight() && !segment.isSunday()){
+            return segment.distance * this.FARE;
+        }
+        if (!this.next) throw new Error('No sequence found')
+        return this.next?.calculate(segment)
+    }
 }
